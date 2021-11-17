@@ -52,6 +52,7 @@
 #include "SystemPackets.h"
 #include "QueryHolder.h"
 #include "World.h"
+#include "Battleground.h"
 
 class LoginQueryHolder : public CharacterDatabaseQueryHolder
 {
@@ -1014,6 +1015,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
 
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
+
+    if (pCurrChar->GetTeam() != pCurrChar->GetOTeam())
+        pCurrChar->FitPlayerInTeam(pCurrChar->GetBattleground() && !pCurrChar->GetBattleground()->isArena() ? true : false, pCurrChar->GetBattleground());
 }
 
 void WorldSession::SendFeatureSystemStatus()

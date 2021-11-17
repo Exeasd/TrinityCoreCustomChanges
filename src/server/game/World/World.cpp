@@ -1226,6 +1226,8 @@ void World::LoadConfigSettings(bool reload)
     m_int_configs[CONFIG_CREATURE_PICKPOCKET_REFILL] = sConfigMgr->GetIntDefault("Creature.PickPocketRefillDelay", 10 * MINUTE);
     m_int_configs[CONFIG_CREATURE_STOP_FOR_PLAYER] = sConfigMgr->GetIntDefault("Creature.MovingStopTimeForPlayer", 3 * MINUTE * IN_MILLISECONDS);
 
+    m_bool_configs[BATTLEGROUND_CROSSFACTION_ENABLED]                = sConfigMgr->GetBoolDefault("CrossfactionBG.enable", true);
+
     if (int32 clientCacheId = sConfigMgr->GetIntDefault("ClientCacheVersion", 0))
     {
         // overwrite DB/old value

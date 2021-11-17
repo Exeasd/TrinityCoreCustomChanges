@@ -61,6 +61,18 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     recvData >> type;
     recvData >> lang;
 
+    if (sWorld->getBoolConfig(BATTLEGROUND_CROSSFACTION_ENABLED) && lang != LANG_ADDON)
+    {
+        switch (type)
+        {
+            case CHAT_MSG_BATTLEGROUND:
+            case CHAT_MSG_BATTLEGROUND_LEADER:
+                lang = LANG_UNIVERSAL;
+            default:
+                break;
+        }
+    }
+
     if (type >= MAX_CHAT_MSG_TYPE)
     {
         TC_LOG_ERROR("network", "CHAT: Wrong message type received: %u", type);
@@ -68,7 +80,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (lang == LANG_UNIVERSAL && type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
+    if (lang == CHAT_MSG_AFK && type != CHAT_MSG_DND)
     {
         TC_LOG_ERROR("entities.player.cheat", "CMSG_MESSAGECHAT: Possible hacking-attempt: %s tried to send a message in universal language", GetPlayerInfo().c_str());
         SendNotification(LANG_UNKNOWN_LANGUAGE);
@@ -290,6 +302,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 SendNotification(GetTrinityString(LANG_SAY_REQ), sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ));
                 return;
             }
+
+            if (!GetPlayer()->IsGameMaster())
+                if (GetPlayer()->SendBattleGroundChat(type, msg))
+                    return;
 
             sender->Say(msg, Language(lang));
             break;
